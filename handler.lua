@@ -30,72 +30,58 @@ for color, code in pairs(GNOME) do
     --colorI.info("#"..tostring(string.sub(string.format("%x", code),1,-1)).."  "..color)
 end
 
-local packetConversion = {
-	query = "SQ",
-	response = "SR",
-	data = "SP",
-	close = "SC",
-	fileQuery = "FQ",
-	fileSend = "FS",
-	fileResponse = "FR",
-	fileHeader = "FH",
-	fileData = "FD",
-	fileEnd = "FE",
-	textWrite = "TW",
-	textCursorPos = "TC",
-	textGetCursorPos = "TG",
-	textGetSize = "TD",
-	textInfo = "TI",
-	textClear = "TE",
-	textClearLine = "TL",
-	textScroll = "TS",
-	textBlink = "TB",
-	textColor = "TF",
-	textBackground = "TK",
-	textIsColor = "TA",
-	textTable = "TT",
-	event = "EV",
-	SQ = "query",
-	SR = "response",
-	SP = "data",
-	SC = "close",
-	FQ = "fileQuery",
-	FS = "fileSend",
-	FR = "fileResponse",
-	FH = "fileHeader",
-	FD = "fileData",
-	FE = "fileEnd",
-	TW = "textWrite",
-	TC = "textCursorPos",
-	TG = "textGetCursorPos",
-	TD = "textGetSize",
-	TI = "textInfo",
-	TE = "textClear",
-	TL = "textClearLine",
-	TS = "textScroll",
-	TB = "textBlink",
-	TF = "textColor",
-	TK = "textBackground",
-	TA = "textIsColor",
-	TT = "textTable",
-	EV = "event",
-}
+--- Creates a remote connecton
+--- @tparam string url
+--@return RemoteHandler
+function RSH.createRemote(url)
+    local output = {}
+    local con = bn.open(url)
+    local w,h = term.getSize()
+    local bar = window.create(term.native(),1,1,w,1,true)
+    local win = window.create(term.current(),1,2,w,h-1,true)
+    
+    function output.keys()
+        while true do
+            con:send({
+                event=true,
+                data={os.pullEvent()}
+            })
+        end
+    end
 
-local packetTypes = {
-    TC = 'setCursorPos',
-    TW = 'write',
-    TB = 'blit',
-    TS = 'scroll',
-    CT = 'clear',
-    CL = 'clearLine',
-    BG = 'setBackgroundColor',
-    CB = 'setCursorBlink',
-    FG = 'setTextColor',
-}
+    function output.renr()
+        while true do
+            local msg = con:receive()
+            --print(msg)
+            if type(msg) == "table" then
+                
+                if msg.gtx then
+                    win[msg.type](table.unpack(msg.data))
+                end
+            end
+        end
+    end
+    function DrawBar()
+        bar.setBackgroundColor(colors.gray)
+        bar.clear()
+        bar.setCursorPos(1,1)
+        bar.setTextColor(colors.blue)
+        bar.write("TRoB")
+        bar.setTextColor(colors.orange)
+        bar.write(' | ')
+        bar.setTextColor(colors.green)
+        bar.write(url)
+    end
 
---- @section RemoteShellHost 
+    win.clear()
+    DrawBar()
+    parallel.waitForAll(
+        output.keys,
+        output.renr        
+    )
+end
 
----creates a Remote Handler
+---creates a host handler
 ---@tparam string url
 --@return RemoteHandler
 function RSH.hostRemote(url)
@@ -189,54 +175,6 @@ function RSH.hostRemote(url)
     return output
 end
 
---- @section RemoteShell
----@tparam string url
-function RSH.createRemote(url)
-    local output = {}
-    local con = bn.open(url)
-    local w,h = term.getSize()
-    local bar = window.create(term.native(),1,1,w,1,true)
-    local win = window.create(term.current(),1,2,w,h-1,true)
-    
-    function output.keys()
-        while true do
-            con:send({
-                event=true,
-                data={os.pullEvent()}
-            })
-        end
-    end
 
-    function output.renr()
-        while true do
-            local msg = con:receive()
-            --print(msg)
-            if type(msg) == "table" then
-                
-                if msg.gtx then
-                    win[msg.type](table.unpack(msg.data))
-                end
-            end
-        end
-    end
-    function DrawBar()
-        bar.setBackgroundColor(colors.gray)
-        bar.clear()
-        bar.setCursorPos(1,1)
-        bar.setTextColor(colors.blue)
-        bar.write("TRoB")
-        bar.setTextColor(colors.orange)
-        bar.write(' | ')
-        bar.setTextColor(colors.green)
-        bar.write(url)
-    end
-
-    win.clear()
-    DrawBar()
-    parallel.waitForAll(
-        output.keys,
-        output.renr        
-    )
-end
 
 return RSH
