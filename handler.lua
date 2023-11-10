@@ -1,4 +1,5 @@
----@module RemoteShell.handler
+---get RemoteShell by running wget run https://raw.githubusercontent.com/BadgeminerCC/RemoteShellWindow/main/install.lua
+-- @module RemoteShell.handler
 
 local RSW = require '.RemoteShell.window'
 local bn = require '.bluenet'
