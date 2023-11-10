@@ -18,9 +18,7 @@ Programs to be Installed:
     - RedRun
     - Bluenet
     - RSW
-
-RSW uses the TRoB(not TRoR) protocol to allow for any program (that uses the craftos bios) to be remotly viewed and interacted with.
-the TRoB protocol uses bluenet networking on channel 0.]], true)
+]], true)
 
 PrimeUI.button(term.current(), 3, h-1, "Next", "done")
 
@@ -114,7 +112,10 @@ PrimeUI.label(term.current(), 3, 4, "BadgeminerCC/RemoteShellWindow",colors.gree
 
 PrimeUI.borderBox(term.current(), 4, 6, w-8, h-8,colors.green)
 local scroller = PrimeUI.scrollBox(term.current(), 4, 6, w-8, h-8, 9000, true, true,colors.green)
-PrimeUI.drawText(scroller, string.format([[Remote Shell Window
+PrimeUI.drawText(scroller, string.format([[Remote Shell Window and handler (RSW/RSH)
+RSW uses the TRoB(not TRoR) protocol to allow for any program (that uses the craftos bios) to be remotly viewed and interacted with.
+the TRoB protocol uses bluenet networking thru wired and wireless connections.
+badgeminer2 is not responsible for hacked computers, stolen passwords or private Keys, or greefing caused by an attacker that may have access to your RSW connection(s)
 ]]), true)
 
 PrimeUI.button(term.current(), 3, h-1, "Install", "done",colors.lime)
